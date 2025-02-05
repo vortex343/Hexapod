@@ -18,6 +18,17 @@ L1 = 5  # Length of base to first vertical joint
 L2 = 9  # Length of first vertical segment
 L3 = 14  # Length of second vertical segment (foot)
 
+# Joint pos offset
+offset_j1_x = 0
+offset_j1_y = 0
+
+offset_j2_y = 0
+offset_j2_z = 0
+
+offset_angle_j1 = 330
+offset_angle_j2 = 0
+offset_angle_j3 = 30
+
 
 
 
