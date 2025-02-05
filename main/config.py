@@ -36,10 +36,22 @@ servos = {
 L1 = 5
 L2 = 9
 L3 = 14
+L1 = 5
+L2 = 9
+L3 = 14
 
 # Joint pos offset
 offsets = {
     # 'arm_name': [x, y, z]
+    'front_right': [0, 0, 0],
+    'front_left': [0, 0, 0],
+    'middle_right': [0, 0, 0],
+    'middle_left': [0, 0, 0],
+    'back_right': [0, 0, 0],
+    'back_left': [0, 0, 0],
+}
+offsets = {
+    # 'joint_name': [x, y, z]
     'front_right': [0, 0, 0],
     'front_left': [0, 0, 0],
     'middle_right': [0, 0, 0],
