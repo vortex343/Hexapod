@@ -2,12 +2,13 @@ import config
 import math
 
 
-def solve_ik_3d(target_position):
-
+def solve_ik_3d(target_position, arm):
     # relative target_position = [x, y, z]
-    x = target_position[0] + config.offset_j1_x
-    y = target_position[1] + config.offset_j2_y
-    z = -(target_position[2] + config.offset_j2_z)
+    offsets = config.offsets[arm]
+    
+    x = target_position[0] + offsets[0]
+    y = target_position[1] + offsets[1]
+    z = -(target_position[2] + offsets[2])
 
 
     # leg dimensions
@@ -47,16 +48,18 @@ def translate_angles(angles):
     
     return [angle1, angle2, angle3]
 
-
-def move_arm(target_position):
-    
-    angles = solve_ik_3d(target_position)
-    servo_angles = translate_angles(angles)
-
-
-    # Move servos
+def move_servos(servo_angles, arm):
+    # Move servos to the specified angles
     for i, angle in enumerate(servo_angles):
-        config.kit.servo[i].angle = angle 
+        if config.servos[arm][i] != -1:
+            config.kit.servo[config.servos[arm][i]].angle = angle
+
+
+def move(target_position, arm):
+    
+    angles = solve_ik_3d(target_position, arm)
+    servo_angles = translate_angles(angles)
+    move_servos(servo_angles, arm)
 
     print(f"Moved to target: {target_position} | Angles: {angles} | Servo Angles: {servo_angles}")
 

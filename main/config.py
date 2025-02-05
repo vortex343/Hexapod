@@ -22,6 +22,16 @@ kit = ServoKit(channels=16)
 for i in range(15):  
     kit.servo[i].actuation_range = actuation_range
 
+servos = {
+    # 'arm_name': [servo 1-3]
+    'front_right': [13, 14, 15],
+    'front_left': [10, 11, 12],
+    'middle_right': [8, 9, -1],
+    'middle_left': [6, 7, -1],
+    'back_right': [3, 4, 5],
+    'back_left': [0, 1, 2],
+}
+
 # Link lengths 
 L1 = 5
 L2 = 9
@@ -29,7 +39,7 @@ L3 = 14
 
 # Joint pos offset
 offsets = {
-    # 'joint_name': [x, y, z]
+    # 'arm_name': [x, y, z]
     'front_right': [0, 0, 0],
     'front_left': [0, 0, 0],
     'middle_right': [0, 0, 0],
