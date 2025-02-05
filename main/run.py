@@ -1,11 +1,10 @@
 import pygame
 import time
-from __init__ import initialize_joystick
 import movement
 import config
 
 def main():
-    joystick = initialize_joystick()
+    joystick = config.initialize_joystick()
     
     while True:
         for event in pygame.event.get():

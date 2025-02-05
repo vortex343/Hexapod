@@ -1,53 +1,6 @@
 import config
 import math
 
-""" for testing purposes"""
-def map_axis_to_angle_inverse(value):
-    return int((value - 1) * config.actuation_range/2 * -1)  
-
-""" for testing purposes"""
-def map_axis_to_angle(value):
-    return int((value + 1) * config.actuation_range/2)  
-
-""" for testing purposes"""
-def move(throttleR, direction_x, direction_y):
-    """ move the robot example"""
-    
-    test0 = map_axis_to_angle(throttleR)
-    config.kit.servo[0].angle = test0 
-
-    test1 = map_axis_to_angle(direction_y)
-    config.kit.servo[1].angle = test1 
-
-    test2 = map_axis_to_angle(direction_y)
-    config.kit.servo[2].angle = test2 
-
-
-
-""" for testing purposes"""
-def solve_ik_2d(target_position):
-
-    # relative target_position = [x, y, z]
-    y = target_position[1] + config.offset_j2_y
-    z = target_position[2] + config.offset_j2_z
-
-
-    # leg dimensions
-    l2 = config.L2
-    l3 = config.L3
-    
-    c = math.sqrt(y**2 + z**2)
-
-    
-    # Calculate angles
-    angle3 = math.acos((l2**2 + l3**2 - c**2) / (2 * l2 * l3))
-
-    temp1 = math.acos((l2**2 + c**2 - l3**2) / (2 * l2 * c))
-    temp2 = math.atan2(z , y)
-    angle2 = temp1 - temp2
-
-    return [0, math.degrees(angle2), math.degrees(angle3)]	
-
 
 def solve_ik_3d(target_position):
 

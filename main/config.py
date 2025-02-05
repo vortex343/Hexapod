@@ -1,7 +1,17 @@
 from adafruit_servokit import ServoKit
 import csv
-from ikpy.chain import Chain
-from ikpy.link import URDFLink
+import pygame
+
+def initialize_joystick():
+    pygame.init()
+    pygame.joystick.init()
+    
+    if pygame.joystick.get_count() == 0:
+        raise RuntimeError("No joystick detected!")
+
+    joystick = pygame.joystick.Joystick(0)
+    joystick.init()
+    return joystick
 
 #Servo range
 actuation_range = 125
@@ -12,34 +22,26 @@ kit = ServoKit(channels=16)
 for i in range(15):  
     kit.servo[i].actuation_range = actuation_range
 
-
 # Link lengths 
-L1 = 5  # Length of base to first vertical joint
-L2 = 9  # Length of first vertical segment
-L3 = 14  # Length of second vertical segment (foot)
+L1 = 5
+L2 = 9
+L3 = 14
 
 # Joint pos offset
-offset_j1_x = 0
-offset_j1_y = 0
-
-offset_j2_y = 0
-offset_j2_z = 0
+offsets = {
+    # 'joint_name': [x, y, z]
+    'front_right': [0, 0, 0],
+    'front_left': [0, 0, 0],
+    'middle_right': [0, 0, 0],
+    'middle_left': [0, 0, 0],
+    'back_right': [0, 0, 0],
+    'back_left': [0, 0, 0],
+}
 
 offset_angle_j1 = 330
 offset_angle_j2 = 0
 offset_angle_j3 = 30
 
-
-
-
-
-# Create a kinematic chain using ikpy
-# Define the lengths of the segments and create a robot arm (with 3 links)
-robot = Chain(name='robot', links=[
-    URDFLink(name='base', origin_translation=[L1, 0, 0], origin_orientation=[0, 0, 0], rotation=[0, 0, 1]),
-    URDFLink(name='joint1', origin_translation=[L2, 0, 0], origin_orientation=[0, 0, 0], rotation=[0, 0, 1]),
-    URDFLink(name='joint2', origin_translation=[L3, 0, 0], origin_orientation=[0, 0, 0], rotation=[0, 0, 1])
-])
 
 # Initialize dictionaries to store button and axis mappings
 button_mappings = {}
