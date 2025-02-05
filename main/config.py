@@ -16,31 +16,49 @@ def initialize_joystick():
 #Servo range
 actuation_range = 125
 
+# Link lengths 
+L1 = 5
+L2 = 9
+L3 = 14
 
 # Initialize the ServoKit for a 16-channel Servo Hat
 kit = ServoKit(channels=16)
 for i in range(15):  
     kit.servo[i].actuation_range = actuation_range
 
-# Link lengths 
-L1 = 5
-L2 = 9
-L3 = 14
+servos = {
+    # 'joint_name': [servo1, servo2, servo3]
+    'front_left': [13, 14, 15],
+    'front_right': [10, 11, 12],
+    'middle_left': [8, 9, -1],
+    'middle_right': [6, 7, -1],
+    'back_left': [3, 4, 5],
+    'back_right': [0, 1, 2],
+}
+
+# TODO Add the correct servo offsets
 
 # Joint pos offset
 offsets = {
     # 'joint_name': [x, y, z]
-    'front_right': [0, 0, 0],
     'front_left': [0, 0, 0],
-    'middle_right': [0, 0, 0],
+    'front_right': [0, 0, 0],
     'middle_left': [0, 0, 0],
-    'back_right': [0, 0, 0],
+    'middle_right': [0, 0, 0],
     'back_left': [0, 0, 0],
+    'back_right': [0, 0, 0],
 }
 
-offset_angle_j1 = 330
-offset_angle_j2 = 0
-offset_angle_j3 = 30
+offsets_angle = {
+    # 'joint_name': [angle1, angle2, angle3]
+    'front_left': [0, 0, 0],
+    'front_right': [0, 0, 0],
+    'middle_left': [0, 0, 0],
+    'middle_right': [0, 0, 0],
+    'back_left': [0, 0, 0],
+    'back_right': [330, 0, 30],
+}
+
 
 
 # Initialize dictionaries to store button and axis mappings

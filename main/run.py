@@ -29,7 +29,7 @@ def main():
                     y =  int(input('y: '))
                     z = int(input('z: '))
                     target_position = [x,y,z]  # Target (x, y, z)
-                    movement.move_arm(target_position)
+                    movement.move(target_position, 'back_right')
                     print('done')
 
                 if Bbutton:
