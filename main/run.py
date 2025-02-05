@@ -1,28 +1,20 @@
 import pygame
 import time
-import movement
+import Leg
 import config
 import init
 
 def main():
+    """initialize the joystick, button mappings, legs and joints"""
+    button_mappings, axis_mappings = init.initialize_button_mapping()
     joystick = init.initialize_joystick()
-    
+
+    """Main loop"""
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                return
-
-            if event.type == pygame.JOYAXISMOTION:
-                throttleL = joystick.get_axis(config.axis_mappings['trigger_L'])
-                dir_y = joystick.get_axis(config.axis_mappings['stick_L_y'])
-
-                throttleR = joystick.get_axis(config.axis_mappings['trigger_R'])
-                movement.move(throttleR, throttleR, throttleL)
-
             if event.type == pygame.JOYBUTTONDOWN:
-                Abutton = joystick.get_button(config.button_mappings['button_A'])
-                Bbutton = joystick.get_button(config.button_mappings['button_B'])
+                Abutton = joystick.get_button(button_mappings['button_A'])
+                Bbutton = joystick.get_button(button_mappings['button_B'])
 
                 if Abutton:
                     # Example target position (in cm)
@@ -30,7 +22,7 @@ def main():
                     y =  int(input('y: '))
                     z = int(input('z: '))
                     target_position = [x,y,z]  # Target (x, y, z)
-                    movement.move_arm(target_position)
+                    
                     print('done')
 
                 if Bbutton:
