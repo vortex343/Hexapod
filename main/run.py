@@ -14,15 +14,27 @@ def main():
             if event.type == pygame.JOYBUTTONDOWN:
                 Abutton = joystick.get_button(button_mappings['button_A'])
                 Bbutton = joystick.get_button(button_mappings['button_B'])
+                Xbutton = joystick.get_button(button_mappings['button_X'])
 
                 if Abutton:
+                    try:
+                        # Example target position (in cm)
+                        x =  int(input('x: '))
+                        y =  int(input('y: '))
+                        z = int(input('z: '))
+                        target_position = [x,y,z]  # Target (x, y, z)
+                        legs['back_right'].move_to_relative_fixed_position(target_position)
+                        print('done')
+                    except:
+                        print('Could not move to target position')
+
+                if Xbutton:
                     # Example target position (in cm)
                     x =  int(input('x: '))
                     y =  int(input('y: '))
                     z = int(input('z: '))
                     target_position = [x,y,z]  # Target (x, y, z)
-                    legs['back'].move_to_global_fixed_position(target_position)
-                    print('done')
+                    legs['back_right'].move_with_arc(target_position)
 
                 if Bbutton:
                     print("Exiting...")

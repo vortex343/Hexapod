@@ -1,8 +1,9 @@
 import pygame # type: ignore
 import csv
 import config
-import Leg
-import Joint
+from Leg import Leg
+from Joint import Joint
+
 
 def initialize_joystick():
     pygame.init()
@@ -43,6 +44,8 @@ def initialize_legs():
         joints = []
 
         for pin, offset in zip(joint_pins, config.joint_offsets):
+            if pin == -1:
+                continue
             joint = Joint(pin, config.joint_offsets[offset])
             joints.append(joint)
 
