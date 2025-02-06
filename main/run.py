@@ -1,4 +1,4 @@
-import pygame
+import pygame # type: ignore
 import time
 import Leg
 import config
@@ -8,6 +8,7 @@ def main():
     """initialize the joystick, button mappings, legs and joints"""
     button_mappings, axis_mappings = init.initialize_button_mapping()
     joystick = init.initialize_joystick()
+    legs = init.initialize_legs()
 
     """Main loop"""
     while True:
