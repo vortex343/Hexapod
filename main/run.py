@@ -19,26 +19,18 @@ def main():
                 if Abutton:
                     try:
                         # Example target position (in cm)
-                        x =  int(input('x: '))
-                        y =  int(input('y: '))
-                        z = int(input('z: '))
+                        x = float(input('x: '))
+                        y = float(input('y: '))
+                        z = float(input('z: '))
                         target_position = [x,y,z]  # Target (x, y, z)
-                        legs['back_right'].move_to_relative_fixed_position(target_position)
+                        legs['front_right'].move_to_relative_fixed_position(target_position)
                         print('done')
                     except:
                         print('Could not move to target position')
 
-                if Xbutton:
-                    # Example target position (in cm)
-                    x =  int(input('x: '))
-                    y =  int(input('y: '))
-                    z = int(input('z: '))
-                    target_position = [x,y,z]  # Target (x, y, z)
-                    legs['back_right'].move_with_arc(target_position)
-
                 if Bbutton:
                     print("Exiting...")
-                    exit()
+                    exit()                    
 
         # Add a small delay to reduce CPU usage
         time.sleep(0.05)

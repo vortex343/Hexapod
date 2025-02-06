@@ -1,4 +1,4 @@
-from adafruit_servokit import ServoKit 
+from adafruit_servokit import ServoKit  # type: ignore
 import time
 
 #kit.servo[0].angle = 180               for angle
