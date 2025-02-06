@@ -1,7 +1,5 @@
 import pygame # type: ignore
 import time
-import Leg
-import config
 import init
 
 def main():
@@ -23,7 +21,7 @@ def main():
                     y =  int(input('y: '))
                     z = int(input('z: '))
                     target_position = [x,y,z]  # Target (x, y, z)
-                    
+                    legs['back'].move_to_global_fixed_position(target_position)
                     print('done')
 
                 if Bbutton:

@@ -1,5 +1,11 @@
+from adafruit_servokit import ServoKit # type: ignore
+
+kit = ServoKit(channels=16)
+
 #Servo range
 actuation_range = 125
+
+
 
 # Link lengths 
 L1 = 5
