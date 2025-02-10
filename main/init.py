@@ -41,11 +41,11 @@ def initialize_button_mapping():
 def initialize_legs():
     legs = {}
     for leg_name in config.legs:
-        position, joint_pins, lengths, offsets = config.legs[leg_name]
+        position, joint_pins, lengths, offsets, inversions = config.legs[leg_name]
         joints = []
 
-        for pin, offset in zip(joint_pins, offsets):
-            joint = Joint(pin, offset)
+        for pin, offset, inverted in zip(joint_pins, offsets, inversions):
+            joint = Joint(pin, offset, inverted)
             joints.append(joint)
 
         leg = Leg(position, joints, lengths)
