@@ -4,5 +4,4 @@ import time
 kit = ServoKit(channels=16)
 for servo in kit.servo:
     servo.actuation_range = 125
-    servo.angle = 125
-    time.sleep(0.5)
+    servo.angle = 0

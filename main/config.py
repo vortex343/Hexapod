@@ -6,7 +6,6 @@ kit = ServoKit(channels=16)
 actuation_range = 125
 
 
-
 # Link lengths 
 L1 = 5
 L2 = 10
@@ -18,17 +17,12 @@ csv_file_path = '/home/elias/Hexapod/main/data/8bitDo.csv'
 
 legs = {
     #TODO add the correct values
-    # 'leg_name': [Position, servo_pins, lengths]
-    'front_right': [[0, 0, 0], [13, 14, 15], [L1, L2, L3]],
-    'front_left': [[0, 0, 0], [10, 11, 12], [L1, L2, L3]],
-    'middle_left': [[0, 0, 0], [8, 9, -1], [L1, L2, L3]],
-    'middle_right': [[0, 0, 0], [6, 7, -1], [L1, L2, L3]],
-    'back_left': [[0, 0, 0], [3, 4, 5], [L1, L2, L3]],
-    'back_right': [[0, 0, 0], [0, 1, 2], [L1, L2, L3]]
+    # 'leg_name':   [Position,      servo_pins,     lengths,        joint_offsets]
+    'front_left':   [[5.5, -5, 4],  [13, 14, 15],   [L1, L2, L3],   [0, 0, 0]],
+    'front_right':  [[5.5, 5, 4],   [10, 11, 12],   [L1, L2, L3],   [0, 0, 0]],
+    'middle_left':  [[0, -5, 4],    [8, 9, -1],     [L1, L2, L3],   [0, 0, 0]],
+    'middle_right': [[0, 5, 4],     [6, 7, -1],     [L1, L2, L3],   [0, 0, 0]],
+    'back_left':    [[-5.5, -5, 4], [3, 4, 5],      [L1, L2, L3],   [0, 0, 0]],
+    'back_right':   [[-5.5, 5, 4],  [0, 1, 2],      [L1, L2, L3],   [0, 0, 0]]
 }
 
-joint_offsets = {
-    'j1': 320,
-    'j2': 0,
-    'j3': 40
-}
