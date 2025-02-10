@@ -3,6 +3,7 @@ import csv
 import config
 from Leg import Leg
 from Joint import Joint
+from Hexapod import Hexabot
 
 
 def initialize_joystick():
@@ -51,3 +52,7 @@ def initialize_legs():
         legs[leg_name] = leg
 
     return legs
+
+def initialize_Hexabot():
+    legs = initialize_legs()
+    return Hexabot(legs)

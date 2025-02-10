@@ -6,7 +6,7 @@ def main():
     """initialize the joystick, button mappings, legs and joints"""
     button_mappings, axis_mappings = init.initialize_button_mapping()
     joystick = init.initialize_joystick()
-    legs = init.initialize_legs()
+    hexabot = init.initialize_Hexabot()
 
     """Main loop"""
     while True:
@@ -23,7 +23,7 @@ def main():
                         y = float(input('y: '))
                         z = float(input('z: '))
                         target_position = [x,y,z]  # Target (x, y, z)
-                        legs['front_right'].move_to_relative_fixed_position(target_position)
+                        hexabot.legs['front_right'].move_to_relative_fixed_position(target_position)
                         print('done')
                     except:
                         print('Could not move to target position')
