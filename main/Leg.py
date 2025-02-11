@@ -47,7 +47,7 @@ class Leg:
             final_angle = angle
             final_angle = (final_angle - joint.offset + 360) % 360
             if joint.inverted == True:
-                print("inverted")
+                
                 final_angle = config.actuation_range - final_angle
 
             if final_angle > config.actuation_range or final_angle < 0:

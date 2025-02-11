@@ -17,16 +17,20 @@ def main():
                 Xbutton = joystick.get_button(button_mappings['button_X'])
 
                 if Abutton:
-                    x = float(input('x: '))
-                    y = float(input('y: '))
-                    z = float(input('z: '))
-                    target_position = [x,y,z]                     
-                    try:
-                        hexabot.legs['front_right'].move_to_relative_fixed_position(target_position)
-
-                        print('done')
-                    except:
-                        print('Could not move right leg to target position')
+                    x = 5
+                    y = 10
+                    z = float(input('z start: '))
+                    z2 = float(input('z goal: '))
+                    for i in range(int(z),int(z2)):
+                        try:
+                            hexabot.legs['back_right'].move_to_relative_fixed_position([-x,y,-i])
+                            hexabot.legs['front_right'].move_to_relative_fixed_position([x,y,-i])
+                            hexabot.legs['back_left'].move_to_relative_fixed_position([-x,-y,-i])
+                            hexabot.legs['front_left'].move_to_relative_fixed_position([x,-y,-i])
+                            print('done')
+                            time.sleep(1)
+                        except:
+                            print('Could not move right leg to target position')
 
                 if Bbutton:
                     print("Exiting...")
