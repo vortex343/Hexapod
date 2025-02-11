@@ -2,6 +2,7 @@ import pygame # type: ignore
 import csv
 import config
 from Leg import Leg
+from Leg import Leg2Joints
 from Joint import Joint
 from Hexapod import Hexabot
 
@@ -47,8 +48,11 @@ def initialize_legs():
         for pin, offset, inverted in zip(joint_pins, offsets, inversions):
             joint = Joint(pin, offset, inverted)
             joints.append(joint)
-
-        leg = Leg(position, joints, lengths)
+        
+        if joints[2].pin < 0:
+            leg = Leg2Joints(position, joints, lengths)
+        else:
+            leg = Leg(position, joints, lengths)
         legs[leg_name] = leg
 
     return legs

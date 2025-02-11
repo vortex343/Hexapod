@@ -44,10 +44,11 @@ class Leg:
 
     def move(self, angles : float):
         for angle, joint in zip(angles, self.joints):
+            if joint.pin < 0:
+                continue
             final_angle = angle
             final_angle = (final_angle - joint.offset + 360) % 360
             if joint.inverted == True:
-                
                 final_angle = config.actuation_range - final_angle
 
             if final_angle > config.actuation_range or final_angle < 0:
@@ -90,3 +91,20 @@ class Leg:
     
     def set_position_global(self, pos : list[float]):
         self._position_global = pos
+
+class Leg2Joints(Leg):
+        def __init__(self, offset : list[float], joints : list[Joint], lengths : list[float]):
+            self.offset = offset
+            self.joints = [joints[0],joints[1]]
+            self.lengths = lengths
+            return
+        
+        def move_to_relative_fixed_position(self, target_position: list[float]):
+            x = target_position[0]
+            y = target_position[1] 
+            z = target_position[2]  
+
+            height = math.degrees(math.atan(z/y))
+            rotation = math.degrees(math.atan(x/y))
+            
+            self.move([rotation, height])
