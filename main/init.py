@@ -21,6 +21,8 @@ def initialize_joystick():
 def initialize_button_mapping():
     button_mappings = {}
     axis_mappings = {}
+    hat_mappings = {}
+
 
     with open(config.csv_file_path, mode='r') as file:
         reader = csv.DictReader(file, delimiter=';')
@@ -28,6 +30,7 @@ def initialize_button_mapping():
             button = row['Button']
             value = row['Value']
             axis = row['Axis']
+            hat = row['Hat']
             
             # Store button mappings
             if value:
@@ -37,7 +40,10 @@ def initialize_button_mapping():
             if axis:
                 axis_mappings[button] = int(axis)
 
-    return button_mappings, axis_mappings
+            if hat:
+                hat_mappings[button] = int(hat)
+
+    return button_mappings, axis_mappings, hat_mappings
 
 def initialize_legs():
     legs = {}

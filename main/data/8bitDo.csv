@@ -1,4 +1,4 @@
-Button;Value;Axis
+Button;Value;Axis;Hat
 button_A;0;
 button_B;1;
 paddel_R;2;
@@ -19,3 +19,4 @@ stick_L_x;;0
 stick_L_y;;1
 stick_R_x;;2
 stick_R_y;;3
+dpad;;;0

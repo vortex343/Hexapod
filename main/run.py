@@ -3,8 +3,9 @@ import time
 import init
 
 def main():
+    clock = pygame.time.Clock()  
     """initialize the joystick, button mappings, legs and joints"""
-    button_mappings, axis_mappings = init.initialize_button_mapping()
+    button_mappings, axis_mappings, hat_mappings = init.initialize_button_mapping()
     joystick = init.initialize_joystick()
     hexabot = init.initialize_Hexabot()
 
@@ -14,7 +15,6 @@ def main():
             if event.type == pygame.JOYBUTTONDOWN:
                 Abutton = joystick.get_button(button_mappings['button_A'])
                 Bbutton = joystick.get_button(button_mappings['button_B'])
-                Xbutton = joystick.get_button(button_mappings['button_X'])
 
                 if Abutton:
                     x = 10
@@ -52,10 +52,17 @@ def main():
 
                 if Bbutton:
                     print("Exiting...")
-                    exit()                    
+                    exit()
+            elif event.type == pygame.JOYAXISMOTION:
+                # axis = joystick.get_axis(axis_mappings['axis_name'])
+                pass
+
+            elif event.type == pygame.JOYHATMOTION:
+                #hat_x, hat_y = joystick.get_hat(hat_mappings['hat_name'])
+                pass                    
 
         # Add a small delay to reduce CPU usage
-        time.sleep(0.05)
+        clock.tick(60)  
 
 if __name__ == "__main__":
     main()
