@@ -1,22 +1,25 @@
-import pygame # type: ignore
-import time
+import pygame 
 import init
 
 def main():
+    
+    #initialize objects and mappings
     clock = pygame.time.Clock()  
-    """initialize the joystick, button mappings, legs and joints"""
-    button_mappings, axis_mappings, hat_mappings = init.initialize_button_mapping()
+    button_mappings, axis_mappings, hat_mappings = init.initialize_controller_mapping()
     joystick = init.initialize_joystick()
     hexabot = init.initialize_Hexabot()
 
-    """Main loop"""
+    # Main loop
     while True:
         for event in pygame.event.get():
             if event.type == pygame.JOYBUTTONDOWN:
-                Abutton = joystick.get_button(button_mappings['button_A'])
-                Bbutton = joystick.get_button(button_mappings['button_B'])
+                # Press Button 
+                # button_name = joystick.get_button(button_mappings['button_name'])
 
-                if Abutton:
+                button_A = joystick.get_button(button_mappings['button_A'])
+                button_B = joystick.get_button(button_mappings['button_B'])
+
+                if button_A:
                     x = 10
                     y = 10
                     z = float(input('z start: '))
@@ -47,21 +50,26 @@ def main():
                         except:
                             print("Couldn't move leg") 
                         print('done')
-                        time.sleep(1)
-
-
-                if Bbutton:
+                if button_B:
                     print("Exiting...")
                     exit()
+
+            elif event.type == pygame.JOYBUTTONUP:
+                # Release Button
+                # button_name = joystick.get_button(button_mappings['button_name'])
+                pass
+
             elif event.type == pygame.JOYAXISMOTION:
+                # Joystick Position
                 # axis = joystick.get_axis(axis_mappings['axis_name'])
                 pass
 
             elif event.type == pygame.JOYHATMOTION:
+                # D-Pad
                 #hat_x, hat_y = joystick.get_hat(hat_mappings['hat_name'])
                 pass                    
 
-        # Add a small delay to reduce CPU usage
+        # Frequenzy of Loop
         clock.tick(60)  
 
 if __name__ == "__main__":
