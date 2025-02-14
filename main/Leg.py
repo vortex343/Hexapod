@@ -72,7 +72,7 @@ class Leg:
         """
 
         x, y, z = target_position
-        l2, l3 = self.lengths
+        l1,l2, l3 = self.lengths
 
         d = math.sqrt(x**2 + y**2)  
         c = math.sqrt(d**2 + z**2)  
@@ -102,5 +102,9 @@ class Leg2Joints(Leg):
 
             height = math.degrees(math.atan(z/y))
             rotation = math.degrees(math.atan(x/y))
-            
-            self.move([rotation, height])
+
+            if y < 0:
+                rotation = 180 + rotation
+
+            self.joints[0].move(rotation)
+            self.joints[1].move(height)

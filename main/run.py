@@ -1,3 +1,4 @@
+import time
 import pygame 
 import init
 
@@ -6,7 +7,7 @@ def main():
     #initialize objects and mappings
     clock = pygame.time.Clock()  
     button_mappings, axis_mappings, hat_mappings = init.initialize_controller_mapping()
-    joystick = init.initialize_joystick()
+    controller = init.initialize_joystick()
     hexabot = init.initialize_Hexabot()
 
     # Main loop
@@ -16,8 +17,11 @@ def main():
                 # Press Button 
                 # button_name = joystick.get_button(button_mappings['button_name'])
 
-                button_A = joystick.get_button(button_mappings['button_A'])
-                button_B = joystick.get_button(button_mappings['button_B'])
+                button_A = controller.get_button(button_mappings['button_A'])
+                button_B = controller.get_button(button_mappings['button_B'])
+                button_X = controller.get_button(button_mappings['button_X'])
+                button_Y = controller.get_button(button_mappings['button_Y'])
+
 
                 if button_A:
                     x = 10
@@ -25,31 +29,30 @@ def main():
                     z = float(input('z start: '))
                     z2 = float(input('z goal: '))
                     for i in range(int(z),int(z2)):
-                        try:
-                            hexabot.legs['back_right'].move_to_relative_fixed_position([-x,y,-i])
-                        except:
-                            print("Couldn't move leg")
-                        try:
-                            hexabot.legs['front_right'].move_to_relative_fixed_position([x,y,-i])
-                        except:
-                            print("Couldn't move leg")
-                        try:
-                            hexabot.legs['back_left'].move_to_relative_fixed_position([-x,-y,-i])
-                        except:
-                            print("Couldn't move leg")
-                        try:
-                            hexabot.legs['front_left'].move_to_relative_fixed_position([x,-y,-i])
-                        except:
-                            print("Couldn't move leg")
-                        try:
-                            hexabot.legs['middle_left'].move_to_relative_fixed_position([0,-y,-i])
-                        except:
-                            print("Couldn't move leg")
-                        try:
-                            hexabot.legs['middle_right'].move_to_relative_fixed_position([0,y,-i])
-                        except:
-                            print("Couldn't move leg") 
-                        print('done')
+                        hexabot.legs['back_right'].move_to_relative_fixed_position([-x,y,-i])
+                        hexabot.legs['front_right'].move_to_relative_fixed_position([x,y,-i])
+
+                        hexabot.legs['back_left'].move_to_relative_fixed_position([-x,-y,-i])
+                        hexabot.legs['front_left'].move_to_relative_fixed_position([x,-y,-i])
+
+                        hexabot.legs['middle_left'].move_to_relative_fixed_position([0,-y,-i])
+                        hexabot.legs['middle_right'].move_to_relative_fixed_position([0,y,-i])
+                        time.sleep(1)
+
+                if button_X:
+                    x = float(input('x: '))
+                    y = float(input('y: '))
+                    z = float(input('z: '))
+
+                    hexabot.legs['middle_left'].move_to_relative_fixed_position([x,y,z])
+
+                if button_Y:
+                    x = float(input('x: '))
+                    y = float(input('y: '))
+                    z = float(input('z: '))
+
+                    hexabot.legs['middle_left'].move_to_relative_fixed_position([x,y,z])
+                
                 if button_B:
                     print("Exiting...")
                     exit()

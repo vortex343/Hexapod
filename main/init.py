@@ -98,7 +98,7 @@ def initialize_legs():
             joints.append(joint)
         
         # if there are only 2 joints create modified legs
-        if joints[2].pin < 0:
+        if len(joints) == 2:
             leg = Leg2Joints(position, joints, lengths)
         else:
             leg = Leg(position, joints, lengths)
