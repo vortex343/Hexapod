@@ -31,7 +31,6 @@ class Joint:
         Raises:
             ValueError: if angle out of range out of range!
         """
-        print(angle)
 
         if self.inverted:
             angle = (self.offset - angle) % 360

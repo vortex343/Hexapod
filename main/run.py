@@ -26,32 +26,38 @@ def main():
                 if button_A:
                     x = 10
                     y = 10
-                    z = float(input('z start: '))
-                    z2 = float(input('z goal: '))
-                    for i in range(int(z),int(z2)):
-                        hexabot.legs['back_right'].move_to_relative_fixed_position([-x,y,-i])
-                        hexabot.legs['front_right'].move_to_relative_fixed_position([x,y,-i])
+                    z1 = int(input('z start: '))
+                    z2 = int(input('z goal: '))
+                    step = 1
+                    diff = 0.5
+                    if z1 > z2:
+                        step = -step
 
-                        hexabot.legs['back_left'].move_to_relative_fixed_position([-x,-y,-i])
-                        hexabot.legs['front_left'].move_to_relative_fixed_position([x,-y,-i])
+                    for i in range(z1, z2, step):
+                        print(i)
+                        z = i*diff
+                        try:
+                            hexabot.legs['back_right'].move_to_relative_fixed_position([-x,y,z+2])
+                            hexabot.legs['front_right'].move_to_relative_fixed_position([x,y,z])
 
-                        hexabot.legs['middle_left'].move_to_relative_fixed_position([0,-y,-i])
-                        hexabot.legs['middle_right'].move_to_relative_fixed_position([0,y,-i])
-                        time.sleep(1)
+                            hexabot.legs['back_left'].move_to_relative_fixed_position([-x,-y,z+2])
+                            hexabot.legs['front_left'].move_to_relative_fixed_position([x,-y,z])
+
+                            
+                            x = x - 0.5*diff
+                            y = y - 0.5*diff
+                            
+                            time.sleep(0.1)
+                        except:
+                            print(f"Stopped at z = {z}!")
+                            break
 
                 if button_X:
                     x = float(input('x: '))
                     y = float(input('y: '))
                     z = float(input('z: '))
 
-                    hexabot.legs['middle_left'].move_to_relative_fixed_position([x,y,z])
-
-                if button_Y:
-                    x = float(input('x: '))
-                    y = float(input('y: '))
-                    z = float(input('z: '))
-
-                    hexabot.legs['middle_left'].move_to_relative_fixed_position([x,y,z])
+                    hexabot.legs['back_left'].move_to_relative_fixed_position([x,y,z])
                 
                 if button_B:
                     print("Exiting...")
