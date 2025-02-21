@@ -25,10 +25,10 @@ class Hexapod:
         self.legs = legs
         self.step = 5
         self.step_height = 10
-        self.step_count = 15
-        self.group_A = self.legs['front_left'], self.legs['middle_right'], self.legs['back_left']
-        self.group_B = self.legs['front_right'], self.legs['middle_left'], self.legs['back_right']
+        self.step_count = 20
+        self.delay = 0.025
 
+#--------------------helper functions--------------------
     async def to_home_position(self):
         """
         Moves all legs to their home position.
@@ -55,36 +55,84 @@ class Hexapod:
             target[0] += x
             target[1] += y
             target[2] += z
-            tasks.append(leg.move_continuous(target, self.step_count))
+            tasks.append(leg.move_continuous(target, self.step_count, self.delay))
         await asyncio.gather(*tasks)
 
+#--------------------movement functions--------------------
     async def move_start(self, direction):
         step = self.step * direction
+        group_A = self.legs['front_left'], self.legs['middle_right'], self.legs['back_left']
+        group_B = self.legs['front_right'], self.legs['middle_left'], self.legs['back_right']
 
         await self.to_home_position()
 
         #Move group a forward
-        await self.move_leg_group(self.group_A, step, 0, self.step_height)
-        await self.move_leg_group(self.group_A, 0, 0, -self.step_height)
+        await self.move_leg_group(group_A, 0, 0, self.step_height)
+        await self.move_leg_group(group_A, step, 0, 0)
+        await self.move_leg_group(group_A, 0, 0, -self.step_height)
     
     async def move_during(self, direction):
         step = self.step * direction
+        group_A = self.legs['front_left'], self.legs['middle_right'], self.legs['back_left']
+        group_B = self.legs['front_right'], self.legs['middle_left'], self.legs['back_right']
+
         #Move Body forward
-        await self.move_leg_group(self.group_A + self.group_B, -step, 0, 0)
+        await self.move_leg_group(group_A + group_B, -step, 0, 0)
 
         #Move group b forward 2x
-        await self.move_leg_group(self.group_B, step * 2, 0, self.step_height)
-        await self.move_leg_group(self.group_B, 0, 0, -self.step_height)
+        await self.move_leg_group(group_B, 0, 0, self.step_height)
+        await self.move_leg_group(group_B, step * 2, 0, 0)
+        await self.move_leg_group(group_B, 0, 0, -self.step_height)
 
         #Move Body forward
-        await self.move_leg_group(self.group_A + self.group_B, -step, 0, 0)
+        await self.move_leg_group(group_A + group_B, -step, 0, 0)
 
         #Move group a forward 2x
-        await self.move_leg_group(self.group_A, step * 2, 0, self.step_height)
-        await self.move_leg_group(self.group_A, 0, 0, -self.step_height)
-
-
+        await self.move_leg_group(group_A, 0, 0, self.step_height)
+        await self.move_leg_group(group_A, step * 2, 0, 0)
+        await self.move_leg_group(group_A, 0, 0, -self.step_height)
 
     async def move_end(self, direction):
         await self.to_home_position()
+
+#--------------------rotation functions--------------------
+    async def rotate_start(self, direction):
+        await self.to_home_position()
+
+    async def rotate_during(self, direction):
+        step = self.step * direction
+        group_A = self.legs['front_left'], self.legs['back_left']
+        group_B = self.legs['front_right'], self.legs['back_right']
+        group_C = tuple([self.legs['middle_right']])
+        group_D = tuple([self.legs['middle_left']])
+
+        #move group A forward and move group C backward
+        await self.move_leg_group(group_A + group_C, 0, 0, self.step_height)
+        tasks = []
+        tasks.append(self.move_leg_group(group_A, step, 0, 0))
+        tasks.append(self.move_leg_group(group_C, -step, 0, 0))
+        await asyncio.gather(*tasks)
+        await self.move_leg_group(group_A + group_C, 0, 0, -self.step_height)
+
+        #move group D forward and move group B backward
+        await self.move_leg_group(group_B + group_D, 0, 0, self.step_height)
+        tasks = []
+        tasks.append(self.move_leg_group(group_B, -step, 0, 0))
+        tasks.append(self.move_leg_group(group_D, step, 0, 0))
+        await asyncio.gather(*tasks)
+        await self.move_leg_group(group_B + group_D, 0, 0, -self.step_height)
+
+        #move group A forward and move group C backward
+        tasks = []
+        await self.move_leg_group(group_A, -step, 0, 0)
+        await self.move_leg_group(group_C, step, 0, 0)
+
+        #move group D forward and move group B backward
+        tasks.append(self.move_leg_group(group_B, step, 0, 0))
+        tasks.append(self.move_leg_group(group_D, -step, 0, 0))
+        await asyncio.gather(*tasks)
+
+    async def rotate_end(self, direction):
+        await self.to_home_position()
+         
 

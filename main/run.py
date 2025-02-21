@@ -12,6 +12,7 @@ async def main():
     hexapod = init.initialize_Hexapod()
 
     dpad_y_pressed = False
+    dpad_x_pressed = False
 
     # Main loop
     while True:
@@ -70,6 +71,8 @@ async def main():
             elif event.type == pygame.JOYHATMOTION:
                 # D-Pad
                 hat_x, hat_y = controller.get_hat(hat_mappings['dpad'])
+
+                #Y-Axis
                 if hat_y != 0 and not dpad_y_pressed:
                     dpad_y_pressed = True
                     await hexapod.move_start(hat_y)
@@ -77,9 +80,18 @@ async def main():
                     dpad_y_pressed = False
                     await hexapod.move_end(hat_y)
 
+                #X-Axis
+                if hat_x != 0 and not dpad_x_pressed:
+                    dpad_x_pressed = True
+                    await hexapod.rotate_start(hat_x)
+                elif hat_x == 0 and dpad_x_pressed:
+                    dpad_x_pressed = False
+                    await hexapod.rotate_end(hat_x)
+
         if dpad_y_pressed:
             await hexapod.move_during(hat_y)
-
+        if dpad_x_pressed:
+            await hexapod.rotate_during(hat_x)
 
         # Frequenzy of Loop
         clock.tick(60)  
