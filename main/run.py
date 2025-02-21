@@ -11,6 +11,7 @@ async def main():
     controller = init.initialize_joystick()
     hexapod = init.initialize_Hexapod()
 
+    dpad_y_pressed = False
 
     # Main loop
     while True:
@@ -25,36 +26,19 @@ async def main():
                 button_Y = controller.get_button(button_mappings['button_Y'])
 
 
-                if button_A:
+                if button_Y:
                     x = 5
-                    y = 15
-                    z1 = 0
-                    z2 = -40
-                    step = 1
-                    diff = 0.5
-                    if z1 > z2:
-                        step = -step
+                    y = 10
+                    z = -20
+                    
+                    hexapod.legs['back_right'].move_to_relative_fixed_position([-x,y,z+2])
+                    hexapod.legs['front_right'].move_to_relative_fixed_position([x,y,z])
 
-                    for i in range(z1, z2, step):
-                        z = i*diff
-                        try:
-                            hexapod.legs['back_right'].move_to_relative_fixed_position([-x,y,z+2])
-                            hexapod.legs['front_right'].move_to_relative_fixed_position([x,y,z])
-
-                            hexapod.legs['back_left'].move_to_relative_fixed_position([-x,-y,z+2])
-                            hexapod.legs['front_left'].move_to_relative_fixed_position([x,-y,z])
-            
-
-                            y = y - 0.5*diff
-                            
-                            time.sleep(0.1)
-                        except:
-                            print(f"error at z = {z} !")
-                        try:
-                            hexapod.legs['middle_right'].move_to_relative_fixed_position([0,y,z])
-                            hexapod.legs['middle_left'].move_to_relative_fixed_position([0,-y,z])
-                        except: 
-                            print(f"error in the middle at z = {z} !")    
+                    hexapod.legs['back_left'].move_to_relative_fixed_position([-x,-y,z+2])
+                    hexapod.legs['front_left'].move_to_relative_fixed_position([x,-y,z])
+                    
+                    hexapod.legs['middle_right'].move_to_relative_fixed_position([0,y,z])
+                    hexapod.legs['middle_left'].move_to_relative_fixed_position([0,-y,z])
 
                 if button_X:
                     x = 5
@@ -69,13 +53,6 @@ async def main():
                     hexapod.legs['middle_right'].move_to_relative_fixed_position([0,y,z])
                     hexapod.legs['middle_left'].move_to_relative_fixed_position([0,-y,z])
                 
-                if button_Y:
-                    x = int(input("x: "))
-                    y = int(input("y: "))
-                    z = int(input("z: "))
-                    await hexapod.legs['middle_left'].move_continuous([x,y,z], 20)
-
-
                 if button_B:
                     print("Exiting...")
                     exit()
@@ -93,9 +70,16 @@ async def main():
             elif event.type == pygame.JOYHATMOTION:
                 # D-Pad
                 hat_x, hat_y = controller.get_hat(hat_mappings['dpad'])
-                if hat_y == 1:
-                    await hexapod.move_forward()
-                                    
+                if hat_y != 0 and not dpad_y_pressed:
+                    dpad_y_pressed = True
+                    await hexapod.move_start(hat_y)
+                elif hat_y == 0 and dpad_y_pressed:
+                    dpad_y_pressed = False
+                    await hexapod.move_end(hat_y)
+
+        if dpad_y_pressed:
+            await hexapod.move_during(hat_y)
+
 
         # Frequenzy of Loop
         clock.tick(60)  

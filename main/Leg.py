@@ -61,7 +61,7 @@ class Leg:
             joint.move(angle)
         self.position_relative = target_position
 
-    async def move_continuous(self, target_position: list[float], steps: int, delay: float = 0.05):
+    async def move_continuous(self, target_position: list[float], steps: int = 10, delay: float = 0.05):
         """
         Moves the Leg to a target position in a continuous manner by breaking the movement into smaller steps.
 
@@ -116,16 +116,22 @@ class Leg2Joints(Leg):
             return
         
         def move_to_relative_fixed_position(self, target_position: list[float]):
-        
-            x, y ,z = target_position
+            """
+            Moves the 2-joint leg to a relative position by computing the correct x (forward) 
+            using hip rotation and the correct z (height) using knee rotation.
+            """
+            x, y, z = target_position
+            z *= 2
+            l1, l2 = self.lengths  # l1 = hip to knee, l2 = knee to foot
 
-            height = math.degrees(math.atan2(z, self.lengths[1]))
-            rotation = math.degrees(math.atan2(x, self.lengths[1]))
+            # Hip rotation should determine the forward x position
+            hip_rotation = math.degrees(math.atan2(x, l1))
 
-            if y < 0:
-                rotation = 180 - rotation
+            # Knee rotation should determine the height z
+            knee_rotation = math.degrees(math.atan2(z, l2))  
 
-            self.joints[0].move(rotation)
-            self.joints[1].move(height)
+            # Move the joints
+            self.joints[0].move(hip_rotation)  # Move hip
+            self.joints[1].move(knee_rotation)  # Move knee
+
             self.position_relative = target_position
-

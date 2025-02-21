@@ -39,6 +39,4 @@ class Joint:
         if not 0 <= angle <= self.actuation_range:
             raise ValueError(f"Angle {angle} out of range!")
         
-        #if self.inverted:
-        #    angle = self.actuation_range - angle
         self.servo.angle = angle
