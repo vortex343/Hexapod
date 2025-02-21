@@ -4,7 +4,7 @@ import config
 from Leg import Leg
 from Leg import Leg2Joints
 from Joint import Joint
-from Hexapod import Hexabot
+from Hexapod import Hexapod
 from adafruit_servokit import ServoKit
 
 
@@ -106,7 +106,7 @@ def initialize_legs():
 
     return legs
 
-def initialize_Hexabot():
+def initialize_Hexapod():
     """
     Initializes a Hexabot robot by creating its legs and passing them to the Hexabot class.
 
@@ -115,5 +115,5 @@ def initialize_Hexabot():
     """
 
     legs = initialize_legs()
-    hexabot = Hexabot(legs)
+    hexabot = Hexapod(legs)
     return hexabot

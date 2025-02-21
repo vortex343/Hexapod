@@ -1,5 +1,7 @@
 import math
+import time
 from Joint import Joint
+import asyncio
 
 class Leg:
     """
@@ -27,7 +29,7 @@ class Leg:
         self.offset = offset
         self.joints = joints
         self.lengths = lengths
-        position_relative = [0,0,0]
+        self.position_relative = [0, 0, 0] 
         return 
     
     
@@ -58,6 +60,23 @@ class Leg:
         for angle, joint in zip(angles, self.joints):
             joint.move(angle)
         self.position_relative = target_position
+
+    async def move_continuous(self, target_position: list[float], steps: int, delay: float = 0.05):
+        """
+        Moves the Leg to a target position in a continuous manner by breaking the movement into smaller steps.
+
+        Args:
+            target_position (list[float]): The target position in relative coordinates [x, y, z].
+            steps (int): The number of steps to break the movement into.
+            delay (float): The delay between each step in seconds.
+        """
+        pos = self.position_relative.copy()  # Copy to avoid modifying original
+        step_size = [(target_position[i] - pos[i]) / steps for i in range(3)]  # Compute incremental step
+
+        for _ in range(steps):  # Ensure smooth motion
+            pos = [pos[i] + step_size[i] for i in range(3)]  # Update each coordinate incrementally
+            self.move_to_relative_fixed_position(pos)
+            await asyncio.sleep(delay)
 
 
     def solve_ik_3d(self, target_position: list[float]):
@@ -93,18 +112,20 @@ class Leg2Joints(Leg):
             self.offset = offset
             self.joints = [joints[0],joints[1]]
             self.lengths = lengths
+            self.position_relative = [0, 0, 0] 
             return
         
         def move_to_relative_fixed_position(self, target_position: list[float]):
-            x = target_position[0]
-            y = target_position[1] 
-            z = target_position[2]  
+        
+            x, y ,z = target_position
 
-            height = math.degrees(math.atan(z/y))
-            rotation = math.degrees(math.atan(x/y))
+            height = math.degrees(math.atan2(z, self.lengths[1]))
+            rotation = math.degrees(math.atan2(x, self.lengths[1]))
 
             if y < 0:
-                rotation = 180 + rotation
+                rotation = 180 - rotation
 
             self.joints[0].move(rotation)
             self.joints[1].move(height)
+            self.position_relative = target_position
+

@@ -14,8 +14,8 @@ legs = {
     'front_left':   [[5.5, -4, 5],  [5, 6, 7],      [L1, L2, L3],   [300, 120, 350],    [False, True, False]],
     'front_right':  [[5.5, 4, 5],   [13, 14, 15],   [L1, L2, L3],   [15, 10, 140],      [False, False, True]],
 
-    'middle_left':  [[0, -5, 5],    [4, 3],         [L1, L2, L3],   [110, 10],       [False, False]],
-    'middle_right': [[0, 5, 5],     [12, 11],       [L1, L2, L3],   [65, 10],           [False, False]],
+    'middle_left':  [[0, -5, 5],    [4, 3],         [L1, 25],   [180+65, 75],       [False, True]],
+    'middle_right': [[0, 5, 5],     [12, 11],       [L1, 25],   [65, 60],           [False, False]],
 
     'back_left':    [[-7, -4, 3], [2, 1, 0],        [L1, L2, L3],   [195, 120, 350],    [False, True, False]],
     'back_right':   [[-7, 4, 3],  [10, 9, 8],       [L1, L2, L3],   [120, 10, 140],     [False, False, True]]
