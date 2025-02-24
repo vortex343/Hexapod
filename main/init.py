@@ -1,3 +1,4 @@
+import time
 import pygame
 import csv
 import config
@@ -6,6 +7,7 @@ from Leg import Leg2Joints
 from Joint import Joint
 from Hexapod import Hexapod
 from adafruit_servokit import ServoKit
+from pathlib import Path
 
 
 def initialize_joystick():
@@ -18,14 +20,19 @@ def initialize_joystick():
     Raises:
         RuntimeError: If no joystick is detected.
     """
-    pygame.init()
-    pygame.joystick.init()
-    
-    if pygame.joystick.get_count() == 0:
-        raise RuntimeError("No joystick detected!")
+    while True:
+        pygame.init()
+        pygame.joystick.init()
+        
+        if pygame.joystick.get_count() == 0:
+            print("No joystick detected. Please connect a joystick.")
+            pygame.joystick.quit()
+            time.sleep(5)
+            continue
 
-    joystick = pygame.joystick.Joystick(0)
-    joystick.init()
+        joystick = pygame.joystick.Joystick(0)
+        joystick.init()
+        break
 
     return joystick
 
@@ -44,12 +51,13 @@ def initialize_controller_mapping():
             - hat_mappings (Dict[str, int]): A dictionary where the keys are button names 
               (str) and the values are the corresponding hat mappings (int).
     """
-
+    root_dir = Path(__file__).resolve().parent.parent
+    file = root_dir / config.csv_file_path
     button_mappings = {}
     axis_mappings = {}
     hat_mappings = {}
 
-    with open(config.csv_file_path, mode='r') as file:
+    with open(file, mode='r') as file:
         reader = csv.DictReader(file, delimiter=';')
         for row in reader:
             button = row['Button']

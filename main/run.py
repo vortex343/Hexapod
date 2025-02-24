@@ -1,4 +1,5 @@
 import time
+import traceback
 import pygame 
 import init
 import asyncio
@@ -29,15 +30,13 @@ async def main():
                 button_X = controller.get_button(button_mappings['button_X'])
                 button_Y = controller.get_button(button_mappings['button_Y'])
                 select = controller.get_button(button_mappings['button_select'])
-
-                if select:
-                    print("Restarting script...")
-                    os.execv(sys.executable, ['python'] + sys.argv)                    
-
-                if button_Y:
-                    await hexapod.to_home_position()
+                button_stick_R = controller.get_button(button_mappings['button_RJ'])
+                button_stick_L = controller.get_button(button_mappings['button_LJ'])                
 
                 if button_X:
+                    await hexapod.to_home_position()
+
+                if button_A:
                     x = 5
                     y = 15
                     z = 0
@@ -50,9 +49,13 @@ async def main():
                     hexapod.legs['middle_right'].move_to_relative_fixed_position([0,y,z])
                     hexapod.legs['middle_left'].move_to_relative_fixed_position([0,-y,z])
                 
-                if button_B:
+                if button_stick_L and button_stick_R:
                     print("Exiting...")
                     exit()
+
+                if select:
+                    print("Restarting script...")
+                    os.execv(sys.executable, ['python'] + sys.argv)
 
             elif event.type == pygame.JOYBUTTONUP:
                 # Release Button
@@ -93,4 +96,9 @@ async def main():
         clock.tick(60)  
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as e: 
+        traceback.print_exc()
+        print(e)        
+        os.execv(sys.executable, ['python'] + sys.argv)
