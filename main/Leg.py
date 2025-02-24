@@ -125,7 +125,7 @@ class Leg2Joints(Leg):
             l1, l2 = self.lengths  # l1 = hip to knee, l2 = knee to foot
 
             # Hip rotation should determine the forward x position
-            hip_rotation = math.degrees(math.atan2(x, l1))
+            hip_rotation = math.degrees(math.atan2(x, l2))
 
             # Knee rotation should determine the height z
             knee_rotation = math.degrees(math.atan2(z, l2))  

@@ -23,7 +23,7 @@ class Hexapod:
             legs (Dict[str, Leg]): A dictionary mapping leg names (str) to corresponding `Leg` objects.
         """
         self.legs = legs
-        self.step = 5
+        self.step = 7
         self.step_height = 10
         self.step_count = 20
         self.delay = 0.025
@@ -34,7 +34,7 @@ class Hexapod:
         Moves all legs to their home position.
         """
         x = 6
-        y = 10
+        y = 7
         z = -18
         #TODO add home to config and move to_home() to leg
         tasks = []
@@ -124,8 +124,8 @@ class Hexapod:
 
         #move group A forward and move group C backward
         tasks = []
-        await self.move_leg_group(group_A, -step, 0, 0)
-        await self.move_leg_group(group_C, step, 0, 0)
+        tasks.append(self.move_leg_group(group_A, -step, 0, 0))
+        tasks.append(self.move_leg_group(group_C, step, 0, 0))
 
         #move group D forward and move group B backward
         tasks.append(self.move_leg_group(group_B, step, 0, 0))

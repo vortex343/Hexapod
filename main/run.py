@@ -2,6 +2,9 @@ import time
 import pygame 
 import init
 import asyncio
+import os
+import sys
+
 
 async def main():
     
@@ -25,21 +28,14 @@ async def main():
                 button_B = controller.get_button(button_mappings['button_B'])
                 button_X = controller.get_button(button_mappings['button_X'])
                 button_Y = controller.get_button(button_mappings['button_Y'])
+                select = controller.get_button(button_mappings['button_select'])
 
+                if select:
+                    print("Restarting script...")
+                    os.execv(sys.executable, ['python'] + sys.argv)                    
 
                 if button_Y:
-                    x = 5
-                    y = 10
-                    z = -20
-                    
-                    hexapod.legs['back_right'].move_to_relative_fixed_position([-x,y,z+2])
-                    hexapod.legs['front_right'].move_to_relative_fixed_position([x,y,z])
-
-                    hexapod.legs['back_left'].move_to_relative_fixed_position([-x,-y,z+2])
-                    hexapod.legs['front_left'].move_to_relative_fixed_position([x,-y,z])
-                    
-                    hexapod.legs['middle_right'].move_to_relative_fixed_position([0,y,z])
-                    hexapod.legs['middle_left'].move_to_relative_fixed_position([0,-y,z])
+                    await hexapod.to_home_position()
 
                 if button_X:
                     x = 5
