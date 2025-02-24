@@ -1,10 +1,11 @@
-import time
 import traceback
 import pygame 
 import init
 import asyncio
 import os
 import sys
+from flask import Flask, Response
+import cv2
 
 
 async def main():
@@ -93,11 +94,41 @@ async def main():
             await hexapod.rotate_during(hat_x)
 
         # Frequenzy of Loop
-        clock.tick(60)  
+        clock.tick(60)
+
+async def cam():
+    global app
+    global camera
+
+    app = Flask(__name__)
+    camera = init.initialize_camera()
+
+    app.run(host='0.0.0.0', port=5000)
+
+
+def generate_frames():
+    while True:
+        # Capture the frame from the camera
+        frame = camera.capture_array()
+        # Explicitly convert BGR to RGB
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        # Encode the frame as JPEG
+        _, buffer = cv2.imencode('.jpg', frame_rgb)
+        frame = buffer.tobytes()
+
+        # Yield the frame as part of an MJPEG stream
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        tasks = [main(), cam()]
+        asyncio.gather(*tasks)
     except Exception as e: 
         traceback.print_exc()
         print(e)        

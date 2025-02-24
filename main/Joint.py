@@ -9,6 +9,8 @@ class Joint:
         inverted (bool): 
             True means the servo moves in the opposite direction as calculated angle
             False means the servo moves in the same direction as calculated angle
+        actuation_range (int): the range of the servo in degrees
+        servo (Servo): the servo object which is controlled
     """
 
     def __init__(self, offset: int, inverted: bool, actuation_range : int, servo : Servo):
@@ -35,7 +37,8 @@ class Joint:
         if self.inverted:
             angle = (self.offset - angle) % 360
         else:
-            angle = (angle + self.offset) % 360
+            angle = (self.offset + angle) % 360
+            
         if not 0 <= angle <= self.actuation_range:
             raise ValueError(f"Angle {angle} out of range!")
         

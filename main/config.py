@@ -6,6 +6,12 @@ L1 = 3
 L2 = 10
 L3 = 18.5
 
+# Movement parameters
+step_x = 7
+step_z = 10
+step_count = 20
+delay = 0.025
+
 # CSV file path for Controller Mappings
 csv_file_path = 'main/data/8bitDo.csv'
 

@@ -27,8 +27,6 @@ def generate_frames():
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-    # Route for the video feed
-
 
 @app.route('/video_feed')
 def video_feed():

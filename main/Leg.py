@@ -1,5 +1,5 @@
 import math
-import time
+import config
 from Joint import Joint
 import asyncio
 
@@ -29,23 +29,7 @@ class Leg:
         self.offset = offset
         self.joints = joints
         self.lengths = lengths
-        self.position_relative = [0, 0, 0] 
-        return 
-    
-    
-    def move_to_global_fixed_position(self, target_position : list[float]):
-        """
-        Moves the Leg to a global target position by adding the offsets and calling move_to_relative_fixed_position()
-
-        Args:
-            target_position (list[float]): The target position in global coordinates [x, y, z].
-        """
-
-        x = target_position[0] + self.offset[0]
-        y = target_position[1] + self.offset[1]
-        z = target_position[2] + self.offset[2]
-
-        self.move_to_relative_fixed_position([x, y, z])
+        self.position_relative = [0, 0, 0]  
 
     
     def move_to_relative_fixed_position(self, target_position: list[float]):
@@ -61,7 +45,7 @@ class Leg:
             joint.move(angle)
         self.position_relative = target_position
 
-    async def move_continuous(self, target_position: list[float], steps: int = 10, delay: float = 0.05):
+    async def move_continuous(self, target_position: list[float], steps: int = config.step_count, delay: float = config.delay):
         """
         Moves the Leg to a target position in a continuous manner by breaking the movement into smaller steps.
 
@@ -108,7 +92,25 @@ class Leg:
 
 
 class Leg2Joints(Leg):
+        """
+        Leg2Joints extends Leg is a Leg with only 2 Joints and therfore has not the full rang of motion in 3d space.
+        The class overrides the move_to_relative_fixed_position() method to move the leg in 2D space.
+
+        Attributes:
+            offset (list[float]): The offset position of the leg in the global space.
+            joints (list[Joint]): A list of Joint objects representing the leg's joints.
+            lengths (list[float]): The lengths of the leg segments (e.g., hip, thigh, shin).
+            position_relative (list[float]): The current relative position of the leg.
+        """
         def __init__(self, offset : list[float], joints : list[Joint], lengths : list[float]):
+            """
+            Initializes the leg with the provided offset, joints, and segment lengths.
+
+            Args:
+                offset (list[float]): The offset position of the leg in the global space.
+                joints (list[Joint]): A list of Joint objects representing the leg's joints.
+                lengths (list[float]): The lengths of the leg segments (e.g., hip, thigh, shin).
+            """
             self.offset = offset
             self.joints = [joints[0],joints[1]]
             self.lengths = lengths

@@ -1,24 +1,25 @@
 import time
 import pygame
 import csv
+from pathlib import Path
+
+from adafruit_servokit import ServoKit
+from picamera2 import Picamera2
+
 import config
 from Leg import Leg
 from Leg import Leg2Joints
 from Joint import Joint
 from Hexapod import Hexapod
-from adafruit_servokit import ServoKit
-from pathlib import Path
 
 
 def initialize_joystick():
     """
     Handles the initialization of the controller
+    If no controller is connected, the function will wait for 5 seconds and try again.
 
     Returns:
         pygame.joystick.Joystick: the pygame joystick
-
-    Raises:
-        RuntimeError: If no joystick is detected.
     """
     while True:
         pygame.init()
@@ -125,3 +126,15 @@ def initialize_Hexapod():
     legs = initialize_legs()
     hexabot = Hexapod(legs)
     return hexabot
+
+def initialize_camera():
+    """
+    Initializes the camera for the robot.
+
+    Returns:
+        Picamera2: An instance of the `Picamera2` class initialized
+    """
+    picam2 = Picamera2()
+    picam2.configure(picam2.create_video_configuration(main={"size": (1920, 1080)}))
+    picam2.start()
+    return picam2
