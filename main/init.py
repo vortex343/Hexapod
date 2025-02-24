@@ -4,7 +4,7 @@ import csv
 from pathlib import Path
 
 from adafruit_servokit import ServoKit
-from picamera2 import Picamera2
+from picamera2 import Picamera2 # type: ignore
 
 import config
 from Leg import Leg

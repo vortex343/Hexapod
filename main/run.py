@@ -6,10 +6,11 @@ import os
 import sys
 from flask import Flask, Response
 import cv2
+from threading import Thread
 
+app = Flask(__name__)
 
-async def main():
-    
+def main():
     #initialize objects and mappings
     clock = pygame.time.Clock()  
     button_mappings, axis_mappings, hat_mappings = init.initialize_controller_mapping()
@@ -35,7 +36,7 @@ async def main():
                 button_stick_L = controller.get_button(button_mappings['button_LJ'])                
 
                 if button_X:
-                    await hexapod.to_home_position()
+                    asyncio.run(hexapod.to_home_position())
 
                 if button_A:
                     x = 5
@@ -75,39 +76,41 @@ async def main():
                 #Y-Axis
                 if hat_y != 0 and not dpad_y_pressed:
                     dpad_y_pressed = True
-                    await hexapod.move_start(hat_y)
+                    asyncio.run(hexapod.move_start(hat_y))
                 elif hat_y == 0 and dpad_y_pressed:
                     dpad_y_pressed = False
-                    await hexapod.move_end(hat_y)
+                    asyncio.run(hexapod.move_end(hat_y))
 
                 #X-Axis
                 if hat_x != 0 and not dpad_x_pressed:
                     dpad_x_pressed = True
-                    await hexapod.rotate_start(hat_x)
+                    asyncio.run(hexapod.rotate_start(hat_x))
                 elif hat_x == 0 and dpad_x_pressed:
                     dpad_x_pressed = False
-                    await hexapod.rotate_end(hat_x)
+                    asyncio.run(hexapod.rotate_end(hat_x))
 
         if dpad_y_pressed:
-            await hexapod.move_during(hat_y)
+            asyncio.run(hexapod.move_during(hat_y))
         if dpad_x_pressed:
-            await hexapod.rotate_during(hat_x)
+            asyncio.run(hexapod.rotate_during(hat_x))
 
-        # Frequenzy of Loop
-        clock.tick(60)
+        clock.tick(30)
 
-async def cam():
-    global app
+def cam():
     global camera
 
-    app = Flask(__name__)
     camera = init.initialize_camera()
 
-    app.run(host='0.0.0.0', port=5000)
+    def run_flask():
+        app.run(host='0.0.0.0', port=5000)
 
+    flask_thread = Thread(target=run_flask)
+    flask_thread.start()
 
 def generate_frames():
     while True:
+        clock = pygame.time.Clock()  
+        clock.tick(30)
         # Capture the frame from the camera
         frame = camera.capture_array()
         # Explicitly convert BGR to RGB
@@ -126,10 +129,12 @@ def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
-    try:
-        tasks = [main(), cam()]
-        asyncio.gather(*tasks)
-    except Exception as e: 
-        traceback.print_exc()
-        print(e)        
-        os.execv(sys.executable, ['python'] + sys.argv)
+    main_thread = Thread(target=main)
+    cam_thread = Thread(target=cam)
+    
+    main_thread.start()
+    cam_thread.start()
+    
+    main_thread.join()
+    cam_thread.join()
+

@@ -2,3 +2,5 @@ pygame
 adafruit-circuitpython-servokit
 flask
 opencv-python
+picamera2
+rpi-libcamera

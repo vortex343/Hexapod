@@ -105,7 +105,7 @@ class Hexapod:
         step_z = self.step_z
 
         #Move Body forward
-        await self.move_leg_group(self.legs, -step_x, 0, 0)
+        await self.move_leg_group(self.group_fl_mr_bl + self.group_fr_ml_br, -step_x, 0, 0)
 
         #Move group b forward 2x
         await self.move_leg_group(self.group_fr_ml_br, 0, 0, step_z)
