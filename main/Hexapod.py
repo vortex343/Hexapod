@@ -33,6 +33,18 @@ class Hexapod:
         self.group_fr_br = self.legs['front_right'], self.legs['back_right']
         self.group_mr = tuple([self.legs['middle_right']])
         self.group_ml = tuple([self.legs['middle_left']])
+
+
+        
+        x = 5
+        y = 15
+        z = -15
+        self.legs['back_right'].move_to_relative_fixed_position([-x, y, z + 2])
+        self.legs['front_right'].move_to_relative_fixed_position([x, y, z])
+        self.legs['back_left'].move_to_relative_fixed_position([-x, -y, z + 2])
+        self.legs['front_left'].move_to_relative_fixed_position([x, -y, z])
+        self.legs['middle_right'].move_to_relative_fixed_position([0, y, z])
+        self.legs['middle_left'].move_to_relative_fixed_position([0, -y, z])
         
 
 #--------------------helper functions--------------------
@@ -159,7 +171,7 @@ class Hexapod:
         tasks.append(self.move_leg_group(self.group_fl_bl, step_x, 0, 0))
         tasks.append(self.move_leg_group(self.group_mr, -step_x, 0, 0))
         await asyncio.gather(*tasks)
-        await self.move_leg_group(self.group_fl_mr_bl, 0, 0, -step_z)
+        await self.move_leg_group(self.group_fl_bl + self.group_mr, 0, 0, -step_z)
 
         #move group D forward and move group B backward
         await self.move_leg_group(self.group_fr_br + self.group_ml, 0, 0, step_z)
@@ -167,7 +179,7 @@ class Hexapod:
         tasks.append(self.move_leg_group(self.group_fr_br, -step_x, 0, 0))
         tasks.append(self.move_leg_group(self.group_ml, step_x, 0, 0))
         await asyncio.gather(*tasks)
-        await self.move_leg_group(self.group_fr_ml_br, 0, 0, -step_z)
+        await self.move_leg_group(self.group_fr_br + self.group_ml, 0, 0, -step_z)
 
         #move group A forward and move group C backward
         tasks = []

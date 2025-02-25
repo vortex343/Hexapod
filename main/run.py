@@ -1,140 +1,156 @@
 import traceback
-import pygame 
+import pygame
 import init
 import asyncio
 import os
 import sys
-from flask import Flask, Response
 import cv2
-from threading import Thread
+import time
+from flask import Flask, Response
+from threading import Thread, Event
+from werkzeug.serving import make_server
 
+# Flask app setup
 app = Flask(__name__)
 
+# Global control flags
+stop_event = Event()
+camera_running = Event()
+
+# Global threads
+cam_thread = None
+server = None
+main_thread = None
+
+
 def main():
-    #initialize objects and mappings
-    clock = pygame.time.Clock()  
+    global cam_thread
+    
+    clock = pygame.time.Clock()
     button_mappings, axis_mappings, hat_mappings = init.initialize_controller_mapping()
     controller = init.initialize_joystick()
     hexapod = init.initialize_Hexapod()
-
-    dpad_y_pressed = False
-    dpad_x_pressed = False
-
-    # Main loop
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.JOYBUTTONDOWN:
-                # Press Button 
-                # button_name = controller.get_button(button_mappings['button_name'])
-
-                button_A = controller.get_button(button_mappings['button_A'])
-                button_B = controller.get_button(button_mappings['button_B'])
-                button_X = controller.get_button(button_mappings['button_X'])
-                button_Y = controller.get_button(button_mappings['button_Y'])
-                select = controller.get_button(button_mappings['button_select'])
-                button_stick_R = controller.get_button(button_mappings['button_RJ'])
-                button_stick_L = controller.get_button(button_mappings['button_LJ'])                
-
-                if button_X:
-                    asyncio.run(hexapod.to_home_position())
-
-                if button_A:
-                    x = 5
-                    y = 15
-                    z = 0
-                    hexapod.legs['back_right'].move_to_relative_fixed_position([-x,y,z+2])
-                    hexapod.legs['front_right'].move_to_relative_fixed_position([x,y,z])
-
-                    hexapod.legs['back_left'].move_to_relative_fixed_position([-x,-y,z+2])
-                    hexapod.legs['front_left'].move_to_relative_fixed_position([x,-y,z])
+    
+    dpad_y_pressed, dpad_x_pressed = False, False
+    
+    try:
+        while not stop_event.is_set():
+            for event in pygame.event.get():
+                if event.type == pygame.JOYBUTTONDOWN:
+                    button_X = controller.get_button(button_mappings['button_X'])
+                    select = controller.get_button(button_mappings['button_select'])
+                    start = controller.get_button(button_mappings['button_start'])
+                    button_stick_L = controller.get_button(button_mappings['button_LJ'])
+                    button_stick_R = controller.get_button(button_mappings['button_RJ'])
                     
-                    hexapod.legs['middle_right'].move_to_relative_fixed_position([0,y,z])
-                    hexapod.legs['middle_left'].move_to_relative_fixed_position([0,-y,z])
+                    if button_X:
+                        asyncio.run(hexapod.to_home_position())
+                    
+                    if button_stick_L and button_stick_R:
+                        print("Exiting...")
+                        raise KeyboardInterrupt
+                    
+                    if select:
+                        print("Restarting script...")
+                        raise Exception("Restarting script...")
+                    
+                    if start and not camera_running.is_set():
+                        print("Starting camera...")
+                        camera_running.set()
+                        cam_thread = Thread(target=cam)
+                        cam_thread.start()
                 
-                if button_stick_L and button_stick_R:
-                    print("Exiting...")
-                    exit()
+                elif event.type == pygame.JOYHATMOTION:
+                    hat_x, hat_y = controller.get_hat(hat_mappings['dpad'])
+                    
+                    if hat_y != 0 and not dpad_y_pressed:
+                        dpad_y_pressed = True
+                        asyncio.run(hexapod.move_start(hat_y))
+                    elif hat_y == 0 and dpad_y_pressed:
+                        dpad_y_pressed = False
+                        asyncio.run(hexapod.move_end(hat_y))
+                    
+                    if hat_x != 0 and not dpad_x_pressed:
+                        dpad_x_pressed = True
+                        asyncio.run(hexapod.rotate_start(hat_x))
+                    elif hat_x == 0 and dpad_x_pressed:
+                        dpad_x_pressed = False
+                        asyncio.run(hexapod.rotate_end(hat_x))
+            
+            if dpad_y_pressed:
+                asyncio.run(hexapod.move_during(controller.get_hat(hat_mappings['dpad'])[1]))
+            if dpad_x_pressed:
+                asyncio.run(hexapod.rotate_during(controller.get_hat(hat_mappings['dpad'])[0]))
+            
+            clock.tick(30)
+    except KeyboardInterrupt:
+        shutdown_procedure()
+    except Exception as e:
+        print(f"Exception in main(): {e}")
+        traceback.print_exc()
+        restart_script()
 
-                if select:
-                    print("Restarting script...")
-                    os.execv(sys.executable, ['python'] + sys.argv)
+# --------------------------------------Shutdown and restart functions--------------------------------------
+def shutdown_procedure():
+    """Handles script shutdown procedures."""
+    print("Interrupted by user, shutting down...")
+    stop_event.set()
+    camera_running.set()
+    traceback.print_exc()
+    
+    if main_thread and main_thread.is_alive():
+        main_thread.join(timeout=5)
+    if cam_thread and cam_thread.is_alive():
+        cam_thread.join(timeout=5)
 
-            elif event.type == pygame.JOYBUTTONUP:
-                # Release Button
-                # button_name = controller.get_button(button_mappings['button_name'])
-                pass
 
-            elif event.type == pygame.JOYAXISMOTION:
-                # Joystick Position
-                # axis = controller.get_axis(axis_mappings['axis_name'])
-                pass
+def restart_script():
+    """Restarts the script safely."""
+    print("Restarting script...")
+    stop_event.set()
+    camera_running.set()
+    
+    if server:
+        try:
+            server.shutdown()
+        except Exception as e:
+            print(f"Error shutting down Flask server: {e}")
+    
+    if cam_thread and cam_thread.is_alive():
+        cam_thread.join(timeout=5)
+    
+    print("Restarting now...")
+    os.execv(sys.executable, [sys.executable] + sys.argv)
 
-            elif event.type == pygame.JOYHATMOTION:
-                # D-Pad
-                hat_x, hat_y = controller.get_hat(hat_mappings['dpad'])
-
-                #Y-Axis
-                if hat_y != 0 and not dpad_y_pressed:
-                    dpad_y_pressed = True
-                    asyncio.run(hexapod.move_start(hat_y))
-                elif hat_y == 0 and dpad_y_pressed:
-                    dpad_y_pressed = False
-                    asyncio.run(hexapod.move_end(hat_y))
-
-                #X-Axis
-                if hat_x != 0 and not dpad_x_pressed:
-                    dpad_x_pressed = True
-                    asyncio.run(hexapod.rotate_start(hat_x))
-                elif hat_x == 0 and dpad_x_pressed:
-                    dpad_x_pressed = False
-                    asyncio.run(hexapod.rotate_end(hat_x))
-
-        if dpad_y_pressed:
-            asyncio.run(hexapod.move_during(hat_y))
-        if dpad_x_pressed:
-            asyncio.run(hexapod.rotate_during(hat_x))
-
-        clock.tick(30)
-
+# --------------------------------------Camera server functions--------------------------------------
 def cam():
-    global camera
-
+    """Starts the camera server."""
+    global server
+    
     camera = init.initialize_camera()
-
-    def run_flask():
-        app.run(host='0.0.0.0', port=5000)
-
-    flask_thread = Thread(target=run_flask)
-    flask_thread.start()
+    server = make_server('0.0.0.0', 5000, app)
+    server.serve_forever()
 
 def generate_frames():
-    while True:
-        clock = pygame.time.Clock()  
+    """Generates video frames for the Flask video feed."""
+    while not stop_event.is_set():
+        clock = pygame.time.Clock()
         clock.tick(30)
-        # Capture the frame from the camera
-        frame = camera.capture_array()
-        # Explicitly convert BGR to RGB
+        frame = cv2.flip(init.initialize_camera().capture_array(), -1)
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-        # Encode the frame as JPEG
         _, buffer = cv2.imencode('.jpg', frame_rgb)
-        frame = buffer.tobytes()
-
-        # Yield the frame as part of an MJPEG stream
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+               b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
 
 @app.route('/video_feed')
 def video_feed():
+    """Flask route for video streaming."""
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
     main_thread = Thread(target=main)
-    cam_thread = Thread(target=cam)
-    
     main_thread.start()
-    cam_thread.start()
-    
     main_thread.join()
-    cam_thread.join()
-
+    
+    if camera_running.is_set() and cam_thread and cam_thread.is_alive():
+        cam_thread.join()
