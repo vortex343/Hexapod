@@ -147,7 +147,8 @@ async def restart_script():
 def cam():
     """Starts the camera server."""
     global server
-    
+    global camera
+    hexapod.speaker_beep()
     camera = init.initialize_camera()
     server = make_server('0.0.0.0', 5000, app)
     server.serve_forever()
@@ -157,7 +158,7 @@ def generate_frames():
     while not stop_event.is_set():
         clock = pygame.time.Clock()
         clock.tick(30)
-        frame = cv2.flip(init.initialize_camera().capture_array(), -1)
+        frame = cv2.flip(camera.capture_array(), -1)
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         _, buffer = cv2.imencode('.jpg', frame_rgb)
         yield (b'--frame\r\n'

@@ -30,7 +30,7 @@ def initialize_joystick():
         if pygame.joystick.get_count() == 0:
             print("No joystick detected. Please connect a joystick.")
             pygame.joystick.quit()
-            time.sleep(5)
+            time.sleep(1)
             continue
 
         joystick = pygame.joystick.Joystick(0)

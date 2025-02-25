@@ -123,14 +123,13 @@ class Leg2Joints(Leg):
             using hip rotation and the correct z (height) using knee rotation.
             """
             x, y, z = target_position
-            z *= 2
             l1, l2 = self.lengths  # l1 = hip to knee, l2 = knee to foot
 
             # Hip rotation should determine the forward x position
-            hip_rotation = math.degrees(math.atan2(x, l2))
+            hip_rotation = math.degrees(math.asin(x/l2))
 
             # Knee rotation should determine the height z
-            knee_rotation = math.degrees(math.atan2(z, l2))  
+            knee_rotation = math.degrees(math.asin(z/l2))  
 
             # Move the joints
             self.joints[0].move(hip_rotation)  # Move hip

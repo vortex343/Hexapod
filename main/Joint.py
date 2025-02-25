@@ -38,7 +38,12 @@ class Joint:
             angle = (self.offset - angle) % 360
         else:
             angle = (self.offset + angle) % 360
-            
+
+        if 140 > angle > 135:
+            angle = 135
+        elif 350 < angle < 360:   
+            angle = 0 
+        
         if not 0 <= angle <= self.actuation_range:
             raise ValueError(f"Angle {angle} out of range!")
         
