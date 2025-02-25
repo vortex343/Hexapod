@@ -1,6 +1,9 @@
 #Servo range
 actuation_range = 135
 
+# Speaker pin
+SPEAKER_PIN = 19  
+
 # Link lengths 
 L1 = 3
 L2 = 10

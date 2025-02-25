@@ -2,6 +2,8 @@ import time
 import pygame
 import csv
 from pathlib import Path
+import RPi.GPIO as GPIO
+
 
 from adafruit_servokit import ServoKit
 from picamera2 import Picamera2 # type: ignore
@@ -124,7 +126,8 @@ def initialize_Hexapod():
     """
 
     legs = initialize_legs()
-    hexabot = Hexapod(legs)
+    speaker = initialize_speaker()
+    hexabot = Hexapod(legs, speaker)
     return hexabot
 
 def initialize_camera():
@@ -138,3 +141,10 @@ def initialize_camera():
     picam2.configure(picam2.create_video_configuration(main={"size": (1920, 1080)}))
     picam2.start()
     return picam2
+
+def initialize_speaker():
+    speaker = config.SPEAKER_PIN
+
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(speaker, GPIO.OUT)
+    return speaker

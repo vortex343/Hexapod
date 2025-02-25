@@ -1,6 +1,8 @@
 import asyncio
 from Leg import Leg
 import config
+import RPi.GPIO as GPIO
+
 
 class Hexapod:
     """
@@ -17,7 +19,7 @@ class Hexapod:
     step_z = config.step_z
 
 
-    def __init__(self, legs: dict[str, Leg]):
+    def __init__(self, legs: dict[str, Leg], speaker_pin: int):
         """
         Initializes the Hexabot with a given set of legs.
 
@@ -25,14 +27,17 @@ class Hexapod:
             legs (Dict[str, Leg]): A dictionary mapping leg names (str) to corresponding `Leg` objects.
         """
         self.legs = legs
+        self.speaker = speaker_pin
 
         self.group_fl_mr_bl = self.legs['front_left'], self.legs['middle_right'], self.legs['back_left']
         self.group_fr_ml_br = self.legs['front_right'], self.legs['middle_left'], self.legs['back_right']
+        
 
         self.group_fl_bl = self.legs['front_left'], self.legs['back_left']
         self.group_fr_br = self.legs['front_right'], self.legs['back_right']
         self.group_mr = tuple([self.legs['middle_right']])
         self.group_ml = tuple([self.legs['middle_left']])
+        
 
 
         
@@ -86,6 +91,13 @@ class Hexapod:
             target[2] += z
             tasks.append(leg.move_continuous(target))
         await asyncio.gather(*tasks)
+
+    async def speaker_beep(self, duration : float = 0.1, frequency : int = 440):
+        """Plays a beep sound on the speaker."""
+        pwm = GPIO.PWM(self.speaker, frequency) 
+        pwm.start(50)
+        await asyncio.sleep(duration)
+        pwm.stop()
 
 #--------------------movement functions--------------------
     async def move_start(self, direction = 1):

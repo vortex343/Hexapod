@@ -23,21 +23,26 @@ server = None
 main_thread = None
 
 
+
 def main():
     global cam_thread
     
     clock = pygame.time.Clock()
     button_mappings, axis_mappings, hat_mappings = init.initialize_controller_mapping()
     controller = init.initialize_joystick()
+    global hexapod 
     hexapod = init.initialize_Hexapod()
     
     dpad_y_pressed, dpad_x_pressed = False, False
     
+    asyncio.run(hexapod.speaker_beep(0.25))
+
     try:
         while not stop_event.is_set():
             for event in pygame.event.get():
                 if event.type == pygame.JOYBUTTONDOWN:
                     button_X = controller.get_button(button_mappings['button_X'])
+                    button_Y = controller.get_button(button_mappings['button_Y'])
                     select = controller.get_button(button_mappings['button_select'])
                     start = controller.get_button(button_mappings['button_start'])
                     button_stick_L = controller.get_button(button_mappings['button_LJ'])
@@ -45,6 +50,9 @@ def main():
                     
                     if button_X:
                         asyncio.run(hexapod.to_home_position())
+
+                    if button_Y:
+                        asyncio.run(hexapod.speaker_beep(0.5))
                     
                     if button_stick_L and button_stick_R:
                         print("Exiting...")
@@ -83,17 +91,21 @@ def main():
                 asyncio.run(hexapod.rotate_during(controller.get_hat(hat_mappings['dpad'])[0]))
             
             clock.tick(30)
+
     except KeyboardInterrupt:
-        shutdown_procedure()
+        asyncio.run(shutdown_procedure())
     except Exception as e:
         print(f"Exception in main(): {e}")
         traceback.print_exc()
-        restart_script()
+        asyncio.run(restart_script())
 
 # --------------------------------------Shutdown and restart functions--------------------------------------
-def shutdown_procedure():
+async def shutdown_procedure():
     """Handles script shutdown procedures."""
     print("Interrupted by user, shutting down...")
+    await hexapod.speaker_beep(0.25)
+    await asyncio.sleep(0.1)
+    await hexapod.speaker_beep(1 , 220)
     stop_event.set()
     camera_running.set()
     traceback.print_exc()
@@ -104,9 +116,13 @@ def shutdown_procedure():
         cam_thread.join(timeout=5)
 
 
-def restart_script():
+async def restart_script():
     """Restarts the script safely."""
     print("Restarting script...")
+    await hexapod.speaker_beep(0.25)
+    await asyncio.sleep(0.25)
+    await hexapod.speaker_beep(0.25)
+
     stop_event.set()
     camera_running.set()
     
