@@ -5,8 +5,8 @@ import asyncio
 import os
 import sys
 import cv2
-import time
 from flask import Flask, Response
+import threading 
 from threading import Thread, Event
 from werkzeug.serving import make_server
 
@@ -34,8 +34,10 @@ def main():
     hexapod = init.initialize_Hexapod()
     
     dpad_y_pressed, dpad_x_pressed = False, False
-    
-    asyncio.run(hexapod.speaker_beep(0.25))
+    asyncio.run(hexapod.speaker_beep(0.25, 261))
+    asyncio.run(hexapod.speaker_beep(0.25, 329))
+    asyncio.run(hexapod.speaker_beep(0.25, 392))
+    asyncio.run(hexapod.speaker_beep(0.25, 523))
 
     try:
         while not stop_event.is_set():
@@ -103,14 +105,17 @@ def main():
 async def shutdown_procedure():
     """Handles script shutdown procedures."""
     print("Interrupted by user, shutting down...")
-    await hexapod.speaker_beep(0.25)
-    await asyncio.sleep(0.1)
-    await hexapod.speaker_beep(1 , 220)
+
+    await (hexapod.speaker_beep(0.25, 523))
+    await (hexapod.speaker_beep(0.25, 392))
+    await (hexapod.speaker_beep(0.25, 329))
+    await (hexapod.speaker_beep(0.25, 261))
+
     stop_event.set()
     camera_running.set()
     traceback.print_exc()
     
-    if main_thread and main_thread.is_alive():
+    if main_thread and main_thread.is_alive() and main_thread != threading.current_thread():
         main_thread.join(timeout=5)
     if cam_thread and cam_thread.is_alive():
         cam_thread.join(timeout=5)
