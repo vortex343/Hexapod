@@ -43,12 +43,16 @@ def main():
         while not stop_event.is_set():
             for event in pygame.event.get():
                 if event.type == pygame.JOYBUTTONDOWN:
+                    button_A = controller.get_button(button_mappings['button_A'])
                     button_X = controller.get_button(button_mappings['button_X'])
                     button_Y = controller.get_button(button_mappings['button_Y'])
                     select = controller.get_button(button_mappings['button_select'])
                     start = controller.get_button(button_mappings['button_start'])
                     button_stick_L = controller.get_button(button_mappings['button_LJ'])
                     button_stick_R = controller.get_button(button_mappings['button_RJ'])
+
+                    if button_A:   
+                        asyncio.run(hexapod.stand_up())
                     
                     if button_X:
                         asyncio.run(hexapod.to_home_position())

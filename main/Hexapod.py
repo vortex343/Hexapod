@@ -42,9 +42,9 @@ class Hexapod:
 
 
         
-        x = 5
-        y = 10
-        z = -15
+        x = 8
+        y = 8
+        z = -10
         self.legs['back_right'].move_to_relative_fixed_position([-x, y, z + 2])
         self.legs['front_right'].move_to_relative_fixed_position([x, y, z])
         self.legs['back_left'].move_to_relative_fixed_position([-x, -y, z + 2])
@@ -54,7 +54,7 @@ class Hexapod:
         
 
 #--------------------helper functions--------------------
-    async def to_home_position(self):
+    async def to_home_position(self, steps = 20):
         """
         Moves all legs to their home position.
         """
@@ -63,14 +63,14 @@ class Hexapod:
         z = -22
         #TODO add home to config and move to_home() to leg
         tasks = []
-        tasks.append(self.legs['back_right'].move_continuous([-x,y,z+2], 20))
-        tasks.append(self.legs['front_right'].move_continuous([x,y,z], 20))
+        tasks.append(self.legs['back_right'].move_continuous([-x,y,z+2], steps))
+        tasks.append(self.legs['front_right'].move_continuous([x,y,z], steps))
 
-        tasks.append(self.legs['back_left'].move_continuous([-x,-y,z+2], 20))
-        tasks.append(self.legs['front_left'].move_continuous([x,-y,z], 20))
+        tasks.append(self.legs['back_left'].move_continuous([-x,-y,z+2], steps))
+        tasks.append(self.legs['front_left'].move_continuous([x,-y,z], steps))
         
-        tasks.append(self.legs['middle_right'].move_continuous([0,y,z], 20))
-        tasks.append(self.legs['middle_left'].move_continuous([0,-y,z], 20))
+        tasks.append(self.legs['middle_right'].move_continuous([0,y,z], steps))
+        tasks.append(self.legs['middle_left'].move_continuous([0,-y,z], steps))
         await asyncio.gather(*tasks)
 
     async def move_leg_group(self, legs, x,y,z):
@@ -104,6 +104,24 @@ class Hexapod:
         pwm.start(50)
         await asyncio.sleep(duration)
         pwm.stop()
+
+    async def stand_up(self):
+        x = 8
+        y = 8
+        z = -10
+        tasks = {
+        self.legs['back_right'].move_continuous([-x, y, z + 2]),
+        self.legs['front_right'].move_continuous([x, y, z]),
+        self.legs['back_left'].move_continuous([-x, -y, z + 2]),
+        self.legs['front_left'].move_continuous([x, -y, z]),
+        self.legs['middle_right'].move_continuous([0, y, z]),
+        self.legs['middle_left'].move_continuous([0, -y, z]),
+        }
+        await asyncio.gather(*tasks)
+        await asyncio.sleep(0.5)
+        await self.to_home_position(45)
+
+
 
 #--------------------movement functions--------------------
     async def move_start(self, direction = 1):
