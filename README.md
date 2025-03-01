@@ -1,7 +1,1 @@
-## Requirements
-
-'''
-sudo apt install -y cmake
-sudo apt install -y libcamera-dev
-
-'''
+A personal project, building a robot with a raspberrypi, servo motors and 3d printed parts
